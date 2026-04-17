@@ -291,7 +291,7 @@ if "LULC Map" in module:
      m = folium.Map(
     location=[CENTER_LAT, CENTER_LON],
     zoom_start=10
-)
+    )
         from folium.plugins import Fullscreen
 
 Fullscreen().add_to(m)
@@ -302,7 +302,7 @@ from folium.plugins import Fullscreen
 m = folium.Map(
     location=[CENTER_LAT, CENTER_LON],
     zoom_start=10
-)
+    )
 
 Fullscreen().add_to(m)
 
