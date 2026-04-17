@@ -285,55 +285,39 @@ if "LULC Map" in module:
         st.error("Earth Engine not initialized.")
         st.stop()
 
-    with st.spinner("⏳ Fetching Sentinel-2, training classifier with verified coordinates... (45–75 sec)"):
+    with st.spinner("⏳ Fetching Sentinel-2, training classifier..."):
         classified_2023, s2_2023 = classify("2023_v4", "2023-01-01", "2023-12-31", 10)
 
-     m = folium.Map(
-         location=[CENTER_LAT, CENTER_LON],
-         zoom_start=10
-     )
-        from folium.plugins import Fullscreen
+    # Create folium map
+    m = folium.Map(
+        location=[CENTER_LAT, CENTER_LON],
+        zoom_start=10
+    )
 
-     Fullscreen().add_to(m)
-     import folium
-     from streamlit_folium import st_folium
-     from folium.plugins import Fullscreen
+    from folium.plugins import Fullscreen
+    Fullscreen().add_to(m)
 
-     m = folium.Map(
-         location=[CENTER_LAT, CENTER_LON],
-         zoom_start=10
-     )
+    # Add Earth Engine layers (tile URLs)
+    def add_ee_layer(image, vis_params, name):
+        map_id = ee.Image(image).getMapId(vis_params)
+        folium.TileLayer(
+            tiles=map_id['tile_fetcher'].url_format,
+            attr='Google Earth Engine',
+            name=name,
+            overlay=True,
+            control=True
+        ).add_to(m)
 
-Fullscreen().add_to(m)
+    # Add layers
+    add_ee_layer(s2_2023, {"bands":["B4","B3","B2"],"min":0,"max":3000}, "True Color")
+    add_ee_layer(classified_2023, LULC_VIS, "LULC Classification")
+    add_ee_layer(s2_2023.select("NDVI"), {"min":-0.2,"max":0.8,"palette":["red","yellow","green"]}, "NDVI")
+    add_ee_layer(s2_2023.select("NDWI"), {"min":-0.5,"max":0.5,"palette":["red","white","blue"]}, "NDWI")
 
-st_folium(m, width=700, height=500)
-        m.addLayer(s2_2023, {"bands":["B4","B3","B2"],"min":0,"max":3000},
-                     "Sentinel-2 True Color", shown=False)
-        m.addLayer(classified_2023, LULC_VIS, "LULC Classification")
-        m.addLayer(s2_2023.select("NDVI"),
-                     {"min":-0.2,"max":0.8,"palette":["#d73027","#fee08b","#1a9850"]},
-                     "NDVI", shown=False)
-        m.addLayer(s2_2023.select("NDWI"),
-                     {"min":-0.5,"max":0.5,"palette":["#d73027","#ffffbf","#4575b4"]},
-                     "NDWI", shown=False)
-        agri = classified_2023.eq(6)
-        m.addLayer(agri.updateMask(agri), {"min":0,"max":1,"palette":["#9370DB"]},
-                     "Agriculture Only", shown=False)
-        m.add_legend(title="Land Cover Classes", legend_dict=LEGEND_DICT, position="bottomright")
-        m.addLayerControl()
+    folium.LayerControl().add_to(m)
 
-    m.to_streamlit(height=650)
-
-    st.markdown("### Land Cover Classes")
-    cols = st.columns(6)
-    for i,(name,color) in enumerate(LEGEND_DICT.items()):
-        with cols[i]:
-            st.markdown(
-                f"<div style='background:{color};height:7px;border-radius:3px;margin-bottom:5px'></div>"
-                f"<div style='font-size:11px;color:#d8eaf6;font-weight:600'>{name}</div>"
-                f"<div style='font-family:Space Mono;font-size:8px;color:#2e4860'>Class {i+1}</div>",
-                unsafe_allow_html=True)
-
+    # Display map
+    st_folium(m, width=700, height=500)
 # ══════════════════════════════════════════════════════════
 # MODULE 2 — CHANGE DETECTION
 # ══════════════════════════════════════════════════════════
@@ -367,7 +351,7 @@ elif "Change Detection" in module:
         actual_change = change_mask.updateMask(land_mask)
 
         # 4. Build Map
-        Map_cd = geemap.Map(center=[CENTER_LAT, CENTER_LON], zoom=10)
+        st.warning("Module under maintenance")
         
         # Add True Color layers for visual verification
         Map_cd.addLayer(s2_2015, {"bands": ["B4", "B3", "B2"], "min": 0, "max": 3000}, "Satellite Image 2016", shown=False)
@@ -435,7 +419,7 @@ elif "Heat Island" in module:
         uhi=lst.subtract(ee.Number(veg_mean)).rename("UHI_Intensity")
         lst_vis={"min":22,"max":42,"palette":["#313695","#4575b4","#74add1","#abd9e9","#e0f3f8","#ffffbf","#fee090","#fdae61","#f46d43","#d73027","#a50026"]}
         uhi_vis={"min":-5,"max":14,"palette":["#2166ac","#92c5de","#f7f7f7","#f4a582","#d6604d","#b2182b"]}
-        Map_uhi=geemap.Map(center=[CENTER_LAT,CENTER_LON],zoom=10,draw_control=False,measure_control=False,fullscreen_control=True)
+        st.warning("Module under maintenance")
         Map_uhi.addLayer(lst,lst_vis,"Land Surface Temperature (°C)")
         Map_uhi.addLayer(uhi,uhi_vis,"UHI Intensity (°C above veg ref)",shown=False)
         Map_uhi.addLayer(classified_2023,LULC_VIS,"LULC Classification",shown=False)
