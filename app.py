@@ -45,16 +45,14 @@ hr { border-color:#162030 !important; }
 # ══════════════════════════════════════════════════════════
 # EARTH ENGINE INIT
 # ══════════════════════════════════════════════════════════
-import json
-
 @st.cache_resource
 def init_ee():
     try:
-        # Local (optional)
         ee.Initialize(project="maj-471914")
         return True
     except:
         try:
+            import json
             service_account = st.secrets["gee"]["service_account"]
             credentials_json = st.secrets["gee"]["credentials"]
 
@@ -71,7 +69,8 @@ def init_ee():
             st.error(f"GEE init failed: {e}")
             return False
 
-    ee_ok = init_ee()
+# ✅ THIS LINE MUST BE HERE (VERY IMPORTANT)
+ee_ok = init_ee()
 
 # ══════════════════════════════════════════════════════════
 # CONSTANTS
