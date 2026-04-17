@@ -1,9 +1,7 @@
 streamlit
 earthengine-api
-geemap==0.30.4
-folium==0.14.0
+folium
 streamlit-folium
 pandas
 numpy
 matplotlib
-setuptools==68.0.0
