@@ -1,7 +1,7 @@
 import streamlit as st
 import ee
-import geemap.foliumap as geemap
-import pandas as pd
+import folium
+from streamlit_folium import st_folium import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -287,24 +287,41 @@ if "LULC Map" in module:
     with st.spinner("⏳ Fetching Sentinel-2, training classifier with verified coordinates... (45–75 sec)"):
         classified_2023, s2_2023 = classify("2023_v4", "2023-01-01", "2023-12-31", 10)
 
-        Map = geemap.Map(center=[CENTER_LAT, CENTER_LON], zoom=10,
-                         draw_control=False, measure_control=False, fullscreen_control=True)
-        Map.addLayer(s2_2023, {"bands":["B4","B3","B2"],"min":0,"max":3000},
+     m = folium.Map(
+    location=[CENTER_LAT, CENTER_LON],
+    zoom_start=10
+)
+        from folium.plugins import Fullscreen
+
+Fullscreen().add_to(m)
+ import folium
+from streamlit_folium import st_folium
+from folium.plugins import Fullscreen
+
+m = folium.Map(
+    location=[CENTER_LAT, CENTER_LON],
+    zoom_start=10
+)
+
+Fullscreen().add_to(m)
+
+st_folium(m, width=700, height=500)
+        m.addLayer(s2_2023, {"bands":["B4","B3","B2"],"min":0,"max":3000},
                      "Sentinel-2 True Color", shown=False)
-        Map.addLayer(classified_2023, LULC_VIS, "LULC Classification")
-        Map.addLayer(s2_2023.select("NDVI"),
+        m.addLayer(classified_2023, LULC_VIS, "LULC Classification")
+        m.addLayer(s2_2023.select("NDVI"),
                      {"min":-0.2,"max":0.8,"palette":["#d73027","#fee08b","#1a9850"]},
                      "NDVI", shown=False)
-        Map.addLayer(s2_2023.select("NDWI"),
+        m.addLayer(s2_2023.select("NDWI"),
                      {"min":-0.5,"max":0.5,"palette":["#d73027","#ffffbf","#4575b4"]},
                      "NDWI", shown=False)
         agri = classified_2023.eq(6)
-        Map.addLayer(agri.updateMask(agri), {"min":0,"max":1,"palette":["#9370DB"]},
+        m.addLayer(agri.updateMask(agri), {"min":0,"max":1,"palette":["#9370DB"]},
                      "Agriculture Only", shown=False)
-        Map.add_legend(title="Land Cover Classes", legend_dict=LEGEND_DICT, position="bottomright")
-        Map.addLayerControl()
+        m.add_legend(title="Land Cover Classes", legend_dict=LEGEND_DICT, position="bottomright")
+        m.addLayerControl()
 
-    Map.to_streamlit(height=650)
+    m.to_streamlit(height=650)
 
     st.markdown("### Land Cover Classes")
     cols = st.columns(6)
