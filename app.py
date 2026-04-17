@@ -289,20 +289,20 @@ if "LULC Map" in module:
         classified_2023, s2_2023 = classify("2023_v4", "2023-01-01", "2023-12-31", 10)
 
      m = folium.Map(
-    location=[CENTER_LAT, CENTER_LON],
-    zoom_start=10
-    )
+         location=[CENTER_LAT, CENTER_LON],
+         zoom_start=10
+     )
         from folium.plugins import Fullscreen
 
-Fullscreen().add_to(m)
- import folium
-from streamlit_folium import st_folium
-from folium.plugins import Fullscreen
+     Fullscreen().add_to(m)
+     import folium
+     from streamlit_folium import st_folium
+     from folium.plugins import Fullscreen
 
-m = folium.Map(
-    location=[CENTER_LAT, CENTER_LON],
-    zoom_start=10
-    )
+     m = folium.Map(
+         location=[CENTER_LAT, CENTER_LON],
+         zoom_start=10
+     )
 
 Fullscreen().add_to(m)
 
