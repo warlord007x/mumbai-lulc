@@ -1,0 +1,7 @@
+streamlit
+earthengine-api
+geemap
+python-box==6.1.0
+pandas
+numpy
+matplotlib
